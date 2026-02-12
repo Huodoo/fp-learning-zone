@@ -79,10 +79,70 @@ function composeLens<S, A, B>(l1: Lens<S, A>, l2: Lens<A, B>): Lens<S, B> {
   );
 }
 
-function composeLensPrism<S, A, B>(l: Lens<S, A>, p: Prism<A, B>): Optional<S, B> {
+function composeLensOptional<S, A, B>(l: Lens<S, A>, opt: Optional<A, B>): Optional<S, B> {
   return optional(
-    (s) => p.getOption(l.get(s)),
-    (s, b) => l.set(s, p.reverseGet(b))
+    (s) => opt.getOption(l.get(s)),
+    (s, b) => l.set(s, opt.set(l.get(s), b))
+  );
+}
+
+function composePrismLens<S, A, B>(p: Prism<S, A>, l: Lens<A, B>): Optional<S, B> {
+  return optional(
+    (s) => {
+      const optA = p.getOption(s);
+      if (optA._tag === 'None') return None();
+      return Some(l.get(optA.value));
+    },
+    (s, b) => {
+      const optA = p.getOption(s);
+      if (optA._tag === 'None') return s;
+      return p.reverseGet(l.set(optA.value, b));
+    }
+  );
+}
+
+function composePrismOptional<S, A, B>(p: Prism<S, A>, opt: Optional<A, B>): Optional<S, B> {
+  return optional(
+    (s) => {
+      const optA = p.getOption(s);
+      if (optA._tag === 'None') return None();
+      return opt.getOption(optA.value);
+    },
+    (s, b) => {
+      const optA = p.getOption(s);
+      if (optA._tag === 'None') return s;
+      return p.reverseGet(opt.set(optA.value, b));
+    }
+  );
+}
+
+function composeOptionalLens<S, A, B>(opt: Optional<S, A>, l: Lens<A, B>): Optional<S, B> {
+  return optional(
+    (s) => {
+      const optA = opt.getOption(s);
+      if (optA._tag === 'None') return None();
+      return Some(l.get(optA.value));
+    },
+    (s, b) => {
+      const optA = opt.getOption(s);
+      if (optA._tag === 'None') return s;
+      return opt.set(s, l.set(optA.value, b));
+    }
+  );
+}
+
+function composeOptionalOptional<S, A, B>(opt1: Optional<S, A>, opt2: Optional<A, B>): Optional<S, B> {
+  return optional(
+    (s) => {
+      const optA = opt1.getOption(s);
+      if (optA._tag === 'None') return None();
+      return opt2.getOption(optA.value);
+    },
+    (s, b) => {
+      const optA = opt1.getOption(s);
+      if (optA._tag === 'None') return s;
+      return opt1.set(s, opt2.set(optA.value, b));
+    }
   );
 }
 
@@ -197,32 +257,57 @@ const cartItemsLens = prop<ShoppingCart, 'items'>('items');
 const discountLens = prop<ShoppingCart, 'discount'>('discount');
 
 // 组合 Optional：更新当前用户的名称
-const currentUserNameOptional = composeLensPrism(
+const currentUserNameOptional = composeLensOptional(
   userLens,
-  composeLensPrism(
+  composePrismOptional(
     somePrism<LoggedInUser>(),
-    composeLens(profileLens, nameLens)
-  )
-);
-
-// 组合 Optional：更新当前用户的头像
-const currentUserAvatarOptional = composeLensPrism(
-  userLens,
-  composeLensPrism(
-    somePrism<LoggedInUser>(),
-    composeLens(
-      profileLens,
-      composeLensPrism(avatarLens, somePrism<string>())
+    composeOptionalLens(
+      optional(
+        (user: LoggedInUser) => Some(user.profile),
+        (user: LoggedInUser, profile: UserProfile) => ({ ...user, profile })
+      ),
+      nameLens
     )
   )
 );
 
+// 组合 Optional：更新当前用户的头像
+const currentUserAvatarOptional: Optional<ECommerceState, string> = {
+  getOption: (state) => {
+    if (state.user._tag === 'None') return None();
+    const user = state.user.value;
+    return user.profile.avatar;
+  },
+  set: (state, avatar) => {
+    if (state.user._tag === 'None') return state;
+    const user = state.user.value;
+    return userLens.set(state, Some({
+      ...user,
+      profile: {
+        ...user.profile,
+        avatar: Some(avatar)
+      }
+    }));
+  },
+  modify: (state, f) => {
+    const opt = currentUserAvatarOptional.getOption(state);
+    if (opt._tag === 'None') return state;
+    return currentUserAvatarOptional.set(state, f(opt.value));
+  }
+};
+
 // 组合 Optional：切换通知设置
-const notificationsOptional = composeLensPrism(
+const notificationsOptional = composeLensOptional(
   userLens,
-  composeLensPrism(
+  composePrismOptional(
     somePrism<LoggedInUser>(),
-    composeLens(preferencesLens, notificationsLens)
+    composeOptionalLens(
+      optional(
+        (user: LoggedInUser) => Some(user.preferences),
+        (user: LoggedInUser, preferences: UserPreferences) => ({ ...user, preferences })
+      ),
+      notificationsLens
+    )
   )
 );
 
@@ -267,21 +352,22 @@ console.log('\n操作 2: 切换通知');
 console.log('通知状态:', notificationsOptional.getOption(state2));
 
 // 操作 3: 移除头像
-const state3 = composeLensPrism(
+const removeAvatarOptional: Optional<ECommerceState, Option<string>> = composeLensOptional(
   userLens,
-  composeLensPrism(
+  composePrismOptional(
     somePrism<LoggedInUser>(),
-    composeLens(profileLens, avatarLens)
+    composeOptionalLens(
+      optional(
+        (user: LoggedInUser) => Some(user.profile),
+        (user: LoggedInUser, profile: UserProfile) => ({ ...user, profile })
+      ),
+      avatarLens
+    )
   )
-).set(state2, None());
+);
+const state3 = removeAvatarOptional.set(state2, None());
 console.log('\n操作 3: 移除头像');
-console.log('头像:', composeLensPrism(
-  userLens,
-  composeLensPrism(
-    somePrism<LoggedInUser>(),
-    composeLens(profileLens, avatarLens)
-  )
-).getOption(state3));
+console.log('头像:', removeAvatarOptional.getOption(state3));
 
 console.log('\n优势: 类型安全、不可变、代码简洁');
 console.log();
@@ -462,25 +548,44 @@ const nameOptionLens = prop<GitHubUser, 'name'>('name');
 const emailOptionLens = prop<GitHubUser, 'email'>('email');
 
 // 安全提取用户名
-const userLoginOptional = composeLensPrism(
+const userLoginOptional = composeLensOptional(
   dataLens,
-  composeLensPrism(
+  composePrismOptional(
     somePrism<GitHubData>(),
-    composeLens(userLens2, loginLens)
+    composeOptionalLens(
+      optional(
+        (data: GitHubData) => Some(data.user),
+        (data: GitHubData, user: GitHubUser) => ({ ...data, user })
+      ),
+      loginLens
+    )
   )
 );
 
 // 安全提取用户真实姓名
-const userRealNameOptional = composeLensPrism(
-  dataLens,
-  composeLensPrism(
-    somePrism<GitHubData>(),
-    composeLens(
-      userLens2,
-      composeLensPrism(nameOptionLens, somePrism<string>())
-    )
-  )
-);
+const userRealNameOptional: Optional<GitHubApiResponse, string> = {
+  getOption: (response) => {
+    if (response.data._tag === 'None') return None();
+    const data = response.data.value;
+    return data.user.name;
+  },
+  set: (response, name) => {
+    if (response.data._tag === 'None') return response;
+    const data = response.data.value;
+    return dataLens.set(response, Some({
+      ...data,
+      user: {
+        ...data.user,
+        name: Some(name)
+      }
+    }));
+  },
+  modify: (response, f) => {
+    const opt = userRealNameOptional.getOption(response);
+    if (opt._tag === 'None') return response;
+    return userRealNameOptional.set(response, f(opt.value));
+  }
+};
 
 // 模拟成功的 API 响应
 const successResponse: GitHubApiResponse = {
@@ -515,22 +620,30 @@ console.log('  用户名:', userLoginOptional.getOption(errorResponse));
 console.log('  真实姓名:', userRealNameOptional.getOption(errorResponse));
 
 // 提取第一个仓库的描述
-const firstRepoDescOptional = composeLensPrism(
-  dataLens,
-  composeLensPrism(
-    somePrism<GitHubData>(),
-    composeLens(
-      repositoriesLens,
-      composeLensPrism(
-        indexOptional<GitHubRepo>(0),
-        composeLensPrism(
-          prop<GitHubRepo, 'description'>('description'),
-          somePrism<string>()
-        )
-      )
-    )
-  )
-);
+const firstRepoDescOptional: Optional<GitHubApiResponse, string> = {
+  getOption: (response) => {
+    if (response.data._tag === 'None') return None();
+    const data = response.data.value;
+    if (data.repositories.length === 0) return None();
+    return data.repositories[0].description;
+  },
+  set: (response, description) => {
+    if (response.data._tag === 'None') return response;
+    const data = response.data.value;
+    if (data.repositories.length === 0) return response;
+    const updatedRepos = [...data.repositories];
+    updatedRepos[0] = { ...updatedRepos[0], description: Some(description) };
+    return dataLens.set(response, Some({
+      ...data,
+      repositories: updatedRepos
+    }));
+  },
+  modify: (response, f) => {
+    const opt = firstRepoDescOptional.getOption(response);
+    if (opt._tag === 'None') return response;
+    return firstRepoDescOptional.set(response, f(opt.value));
+  }
+};
 
 console.log('\n第一个仓库描述:', firstRepoDescOptional.getOption(successResponse));
 console.log();
