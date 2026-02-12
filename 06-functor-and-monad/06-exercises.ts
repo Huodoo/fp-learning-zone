@@ -129,9 +129,9 @@ const validateDiscountCode = (code?: string): Either<string, number> => {
 // TODO: 使用 liftA3 或 do-notation 实现验证
 const validateCart = (item: CartItem): Either<string, ValidatedCart> => {
   return DoEither(function*() {
-    const quantity = yield* validateQuantity(item.quantity);
-    const price = yield* validatePrice(item.price);
-    const discount = yield* validateDiscountCode(item.discountCode);
+    const quantity = yield validateQuantity(item.quantity);
+    const price = yield validatePrice(item.price);
+    const discount = yield validateDiscountCode(item.discountCode);
     
     const finalPrice = price * quantity * (1 - discount);
     
@@ -250,8 +250,8 @@ const getUserLatestPostWithComments = (
   userId: number
 ): Option<{ post: Post; commentCount: number }> => {
   return Do(function*() {
-    const user = yield* findBlogUser(userId);
-    const latestPost = yield* getLatestPost(user);
+    const user = yield findBlogUser(userId);
+    const latestPost = yield getLatestPost(user);
     const postComments = getComments(latestPost);
     
     return {
@@ -318,7 +318,7 @@ const loadConfig = (): Option<Config> => {
     const envConfig = configSources.environment();
     const fileConfig = configSources.file();
     const remoteConfig = configSources.remote();
-    const defaultConfig = yield* configSources.default();
+    const defaultConfig = yield configSources.default();
     
     // 合并配置（优先级从高到低）
     let config = defaultConfig;
@@ -370,25 +370,25 @@ const validateUserData = (data: any): Either<string, UserData> => {
   return DoEither(function*() {
     // 验证字段存在
     if (typeof data.name !== 'string') {
-      return yield* Left('name 字段必须是字符串');
+      return yield Left('name 字段必须是字符串');
     }
     if (typeof data.email !== 'string') {
-      return yield* Left('email 字段必须是字符串');
+      return yield Left('email 字段必须是字符串');
     }
     if (typeof data.age !== 'number') {
-      return yield* Left('age 字段必须是数字');
+      return yield Left('age 字段必须是数字');
     }
     
     // 验证字段有效性
-    const name = yield* (data.name.length >= 2
+    const name = yield (data.name.length >= 2
       ? Right(data.name)
       : Left('name 至少2个字符'));
     
-    const email = yield* (data.email.includes('@')
+    const email = yield (data.email.includes('@')
       ? Right(data.email)
       : Left('email 格式无效'));
     
-    const age = yield* (data.age >= 18 && data.age <= 120
+    const age = yield (data.age >= 18 && data.age <= 120
       ? Right(data.age)
       : Left('age 必须在18-120之间'));
     
@@ -399,8 +399,8 @@ const validateUserData = (data: any): Either<string, UserData> => {
 // TODO: 组合解析和验证
 const parseAndValidateUser = (json: string): Either<string, UserData> => {
   return DoEither(function*() {
-    const data = yield* parseJSON(json);
-    const validated = yield* validateUserData(data);
+    const data = yield parseJSON(json);
+    const validated = yield validateUserData(data);
     return validated;
   });
 };
@@ -438,13 +438,13 @@ const parsePath = (path: string): Either<string, ParsedPath> => {
   return DoEither(function*() {
     // 检查路径格式
     if (!path.startsWith('/')) {
-      return yield* Left('路径必须以 / 开头');
+      return yield Left('路径必须以 / 开头');
     }
     
     const parts = path.split('/').filter(p => p.length > 0);
     
     if (parts.length === 0) {
-      return yield* Left('路径为空');
+      return yield Left('路径为空');
     }
     
     const filename = parts[parts.length - 1];
@@ -454,18 +454,18 @@ const parsePath = (path: string): Either<string, ParsedPath> => {
     const dotIndex = filename.lastIndexOf('.');
     
     if (dotIndex === -1) {
-      return yield* Left('文件名必须包含扩展名');
+      return yield Left('文件名必须包含扩展名');
     }
     
     const name = filename.substring(0, dotIndex);
     const extension = filename.substring(dotIndex + 1);
     
     if (name.length === 0) {
-      return yield* Left('文件名不能为空');
+      return yield Left('文件名不能为空');
     }
     
     if (extension.length === 0) {
-      return yield* Left('扩展名不能为空');
+      return yield Left('扩展名不能为空');
     }
     
     return {
@@ -525,9 +525,9 @@ const deliverOrder = (order: Order): Either<string, Order> => {
 // TODO: 使用 Monad 链完成订单流程
 const processOrderFlow = (order: Order): Either<string, Order> => {
   return DoEither(function*() {
-    const confirmed = yield* confirmOrder(order);
-    const shipped = yield* shipOrder(confirmed);
-    const delivered = yield* deliverOrder(shipped);
+    const confirmed = yield confirmOrder(order);
+    const shipped = yield shipOrder(confirmed);
+    const delivered = yield deliverOrder(shipped);
     return delivered;
   });
 };

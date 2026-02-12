@@ -61,7 +61,7 @@ console.log('3. 使用 Generator 模拟 do-notation\n');
  * Do: 运行 Option Monad 的 do-notation
  * 
  * 使用 Generator 函数来模拟 Haskell 的 do-notation
- * yield* 表达式从 Option 中"提取"值
+ * yield 表达式从 Option 中"提取"值
  * 如果遇到 None，整个计算立即返回 None
  */
 const Do = <T>(gen: () => Generator<Option<any>, T, any>): Option<T> => {
@@ -113,9 +113,9 @@ const calculateOld = (input1: string, input2: string): Option<number> => {
 // ✅ 使用 do-notation
 const calculate = (input1: string, input2: string): Option<number> => {
   return Do(function*() {
-    const a = yield* parseNumber(input1);  // "提取" Option 中的值
-    const b = yield* parseNumber(input2);
-    const result = yield* safeDivide(a, b);
+    const a = yield parseNumber(input1);  // "提取" Option 中的值
+    const b = yield parseNumber(input2);
+    const result = yield safeDivide(a, b);
     return result;
   });
 };
@@ -183,9 +183,9 @@ const findCity = (id: number): Option<City> => {
 // ✅ 使用 do-notation 的查询链
 const getUserCityInfo = (userId: number): Option<string> => {
   return Do(function*() {
-    const user = yield* findUser(userId);
-    const address = yield* findAddress(user.addressId);
-    const city = yield* findCity(address.cityId);
+    const user = yield findUser(userId);
+    const address = yield findAddress(user.addressId);
+    const city = yield findCity(address.cityId);
     
     return `${user.name} 住在 ${city.name} ${address.street}`;
   });
@@ -249,9 +249,9 @@ const validateUserForm = (
   age: number
 ): Either<string, UserForm> => {
   return DoEither(function*() {
-    const validName = yield* validateName(name);
-    const validEmail = yield* validateEmail(email);
-    const validAge = yield* validateAge(age);
+    const validName = yield validateName(name);
+    const validEmail = yield validateEmail(email);
+    const validAge = yield validateAge(age);
     
     return {
       name: validName,
@@ -348,9 +348,9 @@ const generateReceipt = (
 const processOrderComplete = (orderId: string): Either<string, Receipt> => {
   return DoEither(function*() {
     // 依次执行各个步骤，任何一步失败都会立即返回错误
-    const order = yield* findOrder(orderId);
-    const payment = yield* processPayment(order);
-    const shipment = yield* createShipment(payment);
+    const order = yield findOrder(orderId);
+    const payment = yield processPayment(order);
+    const shipment = yield createShipment(payment);
     
     // 所有步骤成功，生成收据
     return generateReceipt(order, payment, shipment);
@@ -410,14 +410,14 @@ const calculateAge = (birthYear: number): Either<string, number> => {
 const transformUser = (user: ApiUser): Either<string, ValidatedUser> => {
   return DoEither(function*() {
     // 验证原始数据
-    const validated = yield* validateApiUser(user);
+    const validated = yield validateApiUser(user);
     
     // 计算年龄
-    const age = yield* calculateAge(validated.birth_year);
+    const age = yield calculateAge(validated.birth_year);
     
     // 检查成年
     if (age < 18) {
-      return yield* Left('用户未成年');
+      return yield Left('用户未成年');
     }
     
     // 转换为目标格式
@@ -506,7 +506,7 @@ const findFirstValidConfig = (): Option<string> => {
   return Do(function*() {
     // 可以使用普通的控制流
     for (const source of sources) {
-      const config = yield* loadConfig(source);
+      const config = yield loadConfig(source);
       // 注意：这里如果 loadConfig 返回 None，会立即退出
       return config;
     }
@@ -521,12 +521,12 @@ console.log();
 // 示例：条件逻辑
 const processWithCondition = (value: number): Option<string> => {
   return Do(function*() {
-    const n = yield* Some(value);
+    const n = yield Some(value);
     
     if (n > 100) {
       return '大于100';
     } else if (n > 50) {
-      const doubled = yield* Some(n * 2);
+      const doubled = yield Some(n * 2);
       return `50-100之间，翻倍后: ${doubled}`;
     } else {
       return '小于等于50';
