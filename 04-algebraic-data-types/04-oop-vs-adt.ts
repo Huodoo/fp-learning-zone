@@ -27,8 +27,11 @@ abstract class ShapeOOP {
 }
 
 class CircleOOP extends ShapeOOP {
-  constructor(private radius: number) {
+  private radius: number;
+  
+  constructor(radius: number) {
     super();
+    this.radius = radius;
   }
   
   area(): number {
@@ -41,8 +44,13 @@ class CircleOOP extends ShapeOOP {
 }
 
 class RectangleOOP extends ShapeOOP {
-  constructor(private width: number, private height: number) {
+  private width: number;
+  private height: number;
+  
+  constructor(width: number, height: number) {
     super();
+    this.width = width;
+    this.height = height;
   }
   
   area(): number {
@@ -112,8 +120,17 @@ console.log('--- 场景1: 添加新的图形类型 (三角形) ---\n');
 
 // OOP: 需要创建新的类，但不需要修改现有代码
 class TriangleOOP extends ShapeOOP {
-  constructor(private base: number, private height: number, private side1: number, private side2: number) {
+  private base: number;
+  private height: number;
+  private side1: number;
+  private side2: number;
+  
+  constructor(base: number, height: number, side1: number, side2: number) {
     super();
+    this.base = base;
+    this.height = height;
+    this.side1 = side1;
+    this.side2 = side2;
   }
   
   area(): number {
@@ -201,8 +218,11 @@ class PendingOrder extends OrderStatus {
 }
 
 class ShippedOrder extends OrderStatus {
-  constructor(private trackingNumber: string) {
+  private trackingNumber: string;
+
+  constructor(trackingNumber: string) {
     super();
+    this.trackingNumber = trackingNumber;
   }
   
   canCancel(): boolean { return false; }
@@ -213,8 +233,11 @@ class ShippedOrder extends OrderStatus {
 }
 
 class DeliveredOrder extends OrderStatus {
-  constructor(private deliveredAt: Date) {
+  private deliveredAt: Date;
+
+  constructor(deliveredAt: Date) {
     super();
+    this.deliveredAt = deliveredAt;
   }
   
   canCancel(): boolean { return false; }
@@ -223,8 +246,11 @@ class DeliveredOrder extends OrderStatus {
 }
 
 class CancelledOrder extends OrderStatus {
-  constructor(private reason: string) {
+  private reason: string;
+
+  constructor(reason: string) {
     super();
+    this.reason = reason;
   }
   
   canCancel(): boolean { return false; }
@@ -304,12 +330,22 @@ console.log('--- OOP: 容易产生非法状态 ---\n');
 
 // ❌ OOP: 使用可选字段，可能产生非法状态
 class Order {
+  public orderId: string;
+  public status: 'pending' | 'shipped' | 'delivered';
+  public trackingNumber?: string;  // 只在 shipped/delivered 时有值
+  public deliveredAt?: Date;         // 只在 delivered 时有值
+
   constructor(
-    public orderId: string,
-    public status: 'pending' | 'shipped' | 'delivered',
-    public trackingNumber?: string,  // 只在 shipped/delivered 时有值
-    public deliveredAt?: Date         // 只在 delivered 时有值
-  ) {}
+    orderId: string,
+    status: 'pending' | 'shipped' | 'delivered',
+    trackingNumber?: string,
+    deliveredAt?: Date
+  ) {
+    this.orderId = orderId;
+    this.status = status;
+    this.trackingNumber = trackingNumber;
+    this.deliveredAt = deliveredAt;
+  }
 }
 
 // 问题: 可以创建非法状态
@@ -344,7 +380,13 @@ console.log('--- OOP 方法 ---\n');
 
 // OOP: 使用继承表示不同权限级别
 abstract class User {
-  constructor(protected name: string, protected email: string) {}
+  protected name: string;
+  protected email: string;
+
+  constructor(name: string, email: string) {
+    this.name = name;
+    this.email = email;
+  }
   
   abstract getPermissions(): string[];
   abstract canAccessAdmin(): boolean;
@@ -371,8 +413,11 @@ class RegisteredUser extends User {
 }
 
 class AdminUser extends User {
-  constructor(name: string, email: string, private adminLevel: number) {
+  private adminLevel: number;
+
+  constructor(name: string, email: string, adminLevel: number) {
     super(name, email);
+    this.adminLevel = adminLevel;
   }
   
   getPermissions(): string[] {
@@ -439,7 +484,11 @@ console.log('--- OOP: 继承层次结构 ---\n');
 
 // OOP: 深层继承可能导致脆弱基类问题
 class Animal {
-  constructor(protected name: string) {}
+  protected name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
   
   makeSound(): string {
     return '某种声音';

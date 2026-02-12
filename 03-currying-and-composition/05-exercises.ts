@@ -348,11 +348,15 @@ const asyncMultiply2 = async (x: number) => {
 
 const asyncOperation = pipeAsync(asyncAdd1, asyncMultiply2);
 
-// Async test
-  
-  // ============================================================================
-  // 练习 9: 实现日志装饰器
-  // ============================================================================
+// Test async pipeline
+console.log('Testing async pipeline...');
+asyncOperation(5).then(result => {
+  console.log('✅ pipeAsync(+1, *2)(5):', result);  // (5+1)*2 = 12
+});
+
+// ============================================================================
+// 练习 9: 实现日志装饰器
+// ============================================================================
   
   console.log('练习 9: 实现日志装饰器\n');
   
@@ -439,8 +443,7 @@ console.log('✅ 前3个有库存且价格<1000的商品:', getTopAffordableProd
   console.log();
   
 console.log('=== 练习完成! ===');
-  console.log('\n💡 提示: 如果某些练习有困难,可以回顾本章的示例代码');
-});
+console.log('\n💡 提示: 如果某些练习有困难,可以回顾本章的示例代码');
 
 // 导出供测试使用
 export {

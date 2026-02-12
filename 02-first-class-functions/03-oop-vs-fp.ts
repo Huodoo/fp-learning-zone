@@ -130,12 +130,17 @@ console.log('2. 复杂示例: 购物车\n');
 console.log('--- OOP 版本 ---\n');
 
 class CartItem {
-  constructor(
-    public id: string,
-    public name: string,
-    public price: number,
-    public quantity: number
-  ) {}
+  public id: string;
+  public name: string;
+  public price: number;
+  public quantity: number;
+
+  constructor(id: string, name: string, price: number, quantity: number) {
+    this.id = id;
+    this.name = name;
+    this.price = price;
+    this.quantity = quantity;
+  }
 
   updateQuantity(newQuantity: number): void {
     this.quantity = newQuantity;
@@ -323,7 +328,11 @@ console.log('3. 继承 vs 组合\n');
 console.log('--- OOP 继承 ---\n');
 
 abstract class Animal {
-  constructor(protected name: string) {}
+  protected name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
 
   abstract makeSound(): string;
 
@@ -578,7 +587,11 @@ console.log('6. 实践建议: 混合使用两种范式\n');
 
 // 示例: 混合范式的用户服务
 class UserService {
-  constructor(private db: Database) {}
+  private db: Database;
+
+  constructor(db: Database) {
+    this.db = db;
+  }
 
   // 方法内部使用纯函数处理数据
   async updateUser(id: number, updates: Partial<UserData>): Promise<UserData> {

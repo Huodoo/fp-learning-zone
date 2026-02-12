@@ -123,13 +123,13 @@ function partial<A, B, C>(
   };
 }
 
-function multiply(a: number, b: number): number {
+function multiplyNums(a: number, b: number): number {
   return a * b;
 }
 
 // 固定第一个参数
-const multiplyBy5 = partial(multiply, 5);
-const multiplyBy10 = partial(multiply, 10);
+const multiplyBy5 = partial(multiplyNums, 5);
+const multiplyBy10 = partial(multiplyNums, 10);
 
 console.log('multiplyBy5(3):', multiplyBy5(3));
 console.log('multiplyBy10(3):', multiplyBy10(3));

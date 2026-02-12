@@ -365,8 +365,8 @@ function sum(a: number, b: number, c: number): number {
   return a + b + c;
 }
 
-const add5and10 = partial3(sum, 5, 10);
-console.log('5 + 10 + 15 =', add5and10(15));  // 30
+const sum5and10 = partial3(sum, 5, 10);
+console.log('5 + 10 + 15 =', sum5and10(15));  // 30
 console.log();
 
 // ============================================================================
@@ -380,7 +380,11 @@ console.log('练习 8: 实现链式调用\n');
  */
 
 class ArrayWrapper<T> {
-  constructor(private data: readonly T[]) {}
+  private data: readonly T[];
+
+  constructor(data: readonly T[]) {
+    this.data = data;
+  }
 
   // TODO: 实现 map
   map<U>(fn: (item: T) => U): ArrayWrapper<U> {
@@ -422,11 +426,11 @@ const result = wrap([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
 console.log('链式调用结果:', result);  // [8, 10, 12]
 
-const sum = wrap([1, 2, 3, 4, 5])
+const sumResult = wrap([1, 2, 3, 4, 5])
   .map(x => x * 2)
   .reduce((acc, x) => acc + x, 0);
 
-console.log('链式调用求和:', sum);  // 30
+console.log('链式调用求和:', sumResult);  // 30
 console.log();
 
 // ============================================================================
