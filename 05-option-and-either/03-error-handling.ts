@@ -545,12 +545,20 @@ console.log();
 // ============================================================================
 
 export {
-  Either,
+export type { 
+  Either, 
+  Left as LeftType, 
+  Right as RightType,
+  Validation,
+  Failure as FailureType,
+  Success as SuccessType,
+  RegistrationError 
+};
+export {
   Left,
   Right,
   isLeft,
   isRight,
-  Validation,
   Failure,
   Success,
   isFailure,
@@ -560,5 +568,4 @@ export {
   tee,
   tryCatch,
   validateAll,
-  RegistrationError,
 };

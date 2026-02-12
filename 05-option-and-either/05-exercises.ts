@@ -672,14 +672,20 @@ console.log();
 // 导出
 // ============================================================================
 
+export type { 
+  Option, 
+  Some as SomeType, 
+  None as NoneType, 
+  Either, 
+  Left as LeftType, 
+  Right as RightType,
+  Validator 
+};
 export {
-  Option,
   Some,
   None,
-  Either,
   Left,
   Right,
-  Validator,
   combineValidators,
   required,
   minLength,

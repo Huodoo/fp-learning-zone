@@ -455,8 +455,8 @@ console.log();
 // 导出
 // ============================================================================
 
+export type { Option, Some as SomeType, None as NoneType };
 export {
-  Option,
   Some,
   None,
   isSome,

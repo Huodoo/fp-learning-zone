@@ -348,9 +348,7 @@ const asyncMultiply2 = async (x: number) => {
 
 const asyncOperation = pipeAsync(asyncAdd1, asyncMultiply2);
 
-asyncOperation(5).then(result => {
-  console.log('✅ pipeAsync(+1, *2)(5):', result);  // (5+1)*2 = 12
-  console.log();
+// Async test
   
   // ============================================================================
   // 练习 9: 实现日志装饰器
@@ -366,25 +364,25 @@ asyncOperation(5).then(result => {
    */
   
   // 你的实现:
-  function trace<T>(label: string) {
-    return (value: T): T => {
-      console.log(`[${label}]`, value);
-      return value;
-    };
-  }
+function trace<T>(label: string) {
+  return (value: T): T => {
+    console.log(`[${label}]`, value);
+    return value;
+  };
+}
   
   // 测试
-  const operationWithTrace = pipe(
-    trace('输入'),
-    add1,
-    trace('加1后'),
-    multiply2,
-    trace('乘2后')
-  );
-  
-  console.log('带日志的管道:');
-  operationWithTrace(5);
-  console.log();
+const operationWithTrace = pipe(
+  trace('输入'),
+  add1,
+  trace('加1后'),
+  multiply2,
+  trace('乘2后')
+);
+
+console.log('带日志的管道:');
+operationWithTrace(5);
+console.log();
   
   // ============================================================================
   // 练习 10: 真实场景 - API 数据处理
@@ -404,43 +402,43 @@ asyncOperation(5).then(result => {
    * 使用 Point-Free 风格实现
    */
   
-  type Product = {
-    id: number;
-    name: string;
-    price: number;
-    inStock: boolean;
-  };
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  inStock: boolean;
+};
   
-  const products: Product[] = [
-    { id: 1, name: 'iPhone 15', price: 5999, inStock: true },
-    { id: 2, name: 'AirPods', price: 899, inStock: true },
-    { id: 3, name: 'MacBook', price: 9999, inStock: false },
-    { id: 4, name: 'iPad', price: 2999, inStock: true },
-    { id: 5, name: 'Apple Watch', price: 1999, inStock: true },
-    { id: 6, name: 'Magic Mouse', price: 599, inStock: true },
-  ];
+const products: Product[] = [
+  { id: 1, name: 'iPhone 15', price: 5999, inStock: true },
+  { id: 2, name: 'AirPods', price: 899, inStock: true },
+  { id: 3, name: 'MacBook', price: 9999, inStock: false },
+  { id: 4, name: 'iPad', price: 2999, inStock: true },
+  { id: 5, name: 'Apple Watch', price: 1999, inStock: true },
+  { id: 6, name: 'Magic Mouse', price: 599, inStock: true },
+];
   
   // 你的实现:
-  const inStock = (p: Product) => p.inStock;
-  const affordable = (p: Product) => p.price < 1000;
-  const sortByPriceDesc = (products: Product[]) =>
-    [...products].sort((a, b) => b.price - a.price);
-  const take = (n: number) => <T>(arr: T[]) => arr.slice(0, n);
-  const getName = (p: Product) => p.name;
+const inStock = (p: Product) => p.inStock;
+const affordable = (p: Product) => p.price < 1000;
+const sortByPriceDesc = (products: Product[]) =>
+  [...products].sort((a, b) => b.price - a.price);
+const take = (n: number) => <T>(arr: T[]) => arr.slice(0, n);
+const getName = (p: Product) => p.name;
   
-  const getTopAffordableProducts = pipe(
-    filter(inStock),
-    filter(affordable),
-    sortByPriceDesc,
-    take(3),
-    map(getName)
-  );
+const getTopAffordableProducts = pipe(
+  filter(inStock),
+  filter(affordable),
+  sortByPriceDesc,
+  take(3),
+  map(getName)
+);
   
-  console.log('✅ 前3个有库存且价格<1000的商品:', getTopAffordableProducts(products));
+console.log('✅ 前3个有库存且价格<1000的商品:', getTopAffordableProducts(products));
   // 应该输出: ['AirPods', 'Magic Mouse']
   console.log();
   
-  console.log('=== 练习完成! ===');
+console.log('=== 练习完成! ===');
   console.log('\n💡 提示: 如果某些练习有困难,可以回顾本章的示例代码');
 });
 

@@ -558,10 +558,17 @@ console.log();
 // ============================================================================
 
 export {
-  Option,
+export type { 
+  Option, 
+  Some as SomeType, 
+  None as NoneType,
+  Either,
+  Left as LeftType,
+  Right as RightType
+};
+export {
   Some,
   None,
-  Either,
   Left,
   Right,
   mapOption,

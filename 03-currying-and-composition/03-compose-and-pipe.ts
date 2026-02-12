@@ -26,7 +26,7 @@ const add1 = (x: number): number => x + 1;
 const multiply2 = (x: number): number => x * 2;
 const square = (x: number): number => x * x;
 
-const result1 = add1(multiply2(square(5)));  // ((5^2) * 2) + 1 = 51
+const formResult1 = add1(multiply2(square(5)));  // ((5^2) * 2) + 1 = 51
 console.log('嵌套调用:', result1);
 
 // 问题: 嵌套调用难以阅读,从内向外读
@@ -308,8 +308,8 @@ const invalidData: FormData = {
   password: '123',
 };
 
-const result1 = validateForm({ data: validData, errors: [] });
-const result2 = validateForm({ data: invalidData, errors: [] });
+const formResult1 = validateForm({ data: validData, errors: [] });
+const formResult2 = validateForm({ data: invalidData, errors: [] });
 
 console.log('有效数据验证:', result1.errors.length === 0 ? '通过' : '失败');
 console.log('无效数据验证:', result2.errors);

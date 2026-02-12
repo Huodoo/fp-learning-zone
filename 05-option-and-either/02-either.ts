@@ -552,8 +552,8 @@ console.log();
 // 导出
 // ============================================================================
 
+export type { Either, Left as LeftType, Right as RightType, ValidationError };
 export {
-  Either,
   Left,
   Right,
   isLeft,
@@ -567,5 +567,4 @@ export {
   fromPredicate,
   tryCatch,
   sequence,
-  ValidationError,
 };
