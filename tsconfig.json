@@ -1,0 +1,62 @@
+{
+  "compilerOptions": {
+    /* 语言和环境 */
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    
+    /* 严格模式 - 启用所有严格类型检查选项 */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    
+    /* 额外检查 */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    
+    /* 模块解析 */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    
+    /* 输出 */
+    "outDir": "./dist",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    
+    /* 其他 */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "01-pure-functions/**/*.ts",
+    "02-first-class-functions/**/*.ts",
+    "03-currying-and-composition/**/*.ts",
+    "04-algebraic-data-types/**/*.ts",
+    "05-option-and-either/**/*.ts",
+    "06-functor-and-monad/**/*.ts",
+    "07-io-and-effects/**/*.ts",
+    "08-reader-and-dependency/**/*.ts",
+    "09-recursive-thinking/**/*.ts",
+    "10-type-classes/**/*.ts",
+    "11-optics/**/*.ts",
+    "12-capstone-project/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
