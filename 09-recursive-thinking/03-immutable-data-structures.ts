@@ -337,37 +337,34 @@ console.log();
  */
 const foldTree = <A, B>(
   onLeaf: (value: A) => B,
-  onBranch: (left: B, right: B) => B,
-  tree: Tree<A>
-): B => {
+  onBranch: (left: B, right: B) => B
+) => (tree: Tree<A>): B => {
   if (isLeaf(tree)) {
     return onLeaf(tree.value);
   }
   return onBranch(
-    foldTree(onLeaf, onBranch, tree.left),
-    foldTree(onLeaf, onBranch, tree.right)
+    foldTree(onLeaf, onBranch)(tree.left),
+    foldTree(onLeaf, onBranch)(tree.right)
   );
 };
 
 console.log('foldTree 示例:');
 
 // 求和：所有叶子节点的值
-const sumTree = (tree: Tree<number>): number =>
-  foldTree(
-    (value) => value,           // 叶子节点返回值本身
-    (left, right) => left + right  // 分支节点求和
-  )(tree);
+const sumTree = foldTree<number, number>(
+  (value) => value,           // 叶子节点返回值本身
+  (left, right) => left + right  // 分支节点求和
+);
 
 console.log('  tree1 求和:', sumTree(tree1));
 console.log('  tree2 求和:', sumTree(tree2));
 console.log();
 
 // 求最大值
-const maxTree = (tree: Tree<number>): number =>
-  foldTree(
-    (value) => value,
-    (left, right) => Math.max(left, right)
-  )(tree);
+const maxTree = foldTree<number, number>(
+  (value) => value,
+  (left, right) => Math.max(left, right)
+);
 
 console.log('  tree2 最大值:', maxTree(tree2));
 console.log();

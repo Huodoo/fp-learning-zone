@@ -114,16 +114,17 @@ const isNil = <A>(list: List<A>): list is Nil => list._tag === 'Nil';
  */
 function foldList<A, B>(
   onNil: () => B,
-  onCons: (head: A, tailResult: B) => B,
-  list: List<A>
-): B {
-  if (isNil(list)) {
-    return onNil();
-  }
-  
-  // 先递归处理尾部，再用头部组合
-  const tailResult = foldList(onNil, onCons, list.tail);
-  return onCons(list.head, tailResult);
+  onCons: (head: A, tailResult: B) => B
+) {
+  return function fold(list: List<A>): B {
+    if (isNil(list)) {
+      return onNil();
+    }
+    
+    // 先递归处理尾部，再用头部组合
+    const tailResult = fold(list.tail);
+    return onCons(list.head, tailResult);
+  };
 }
 
 // 从数组创建链表
@@ -190,17 +191,18 @@ const isLeaf = <A>(tree: Tree<A>): tree is Leaf<A> => tree._tag === 'Leaf';
  */
 function foldTree<A, B>(
   onLeaf: (value: A) => B,
-  onBranch: (left: B, right: B) => B,
-  tree: Tree<A>
-): B {
-  if (isLeaf(tree)) {
-    return onLeaf(tree.value);
-  }
-  
-  // 递归处理左右子树，再组合
-  const leftResult = foldTree(onLeaf, onBranch, tree.left);
-  const rightResult = foldTree(onLeaf, onBranch, tree.right);
-  return onBranch(leftResult, rightResult);
+  onBranch: (left: B, right: B) => B
+) {
+  return function fold(tree: Tree<A>): B {
+    if (isLeaf(tree)) {
+      return onLeaf(tree.value);
+    }
+    
+    // 递归处理左右子树，再组合
+    const leftResult = fold(tree.left);
+    const rightResult = fold(tree.right);
+    return onBranch(leftResult, rightResult);
+  };
 }
 
 const tree = Branch(
